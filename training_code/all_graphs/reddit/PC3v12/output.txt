@@ -1,0 +1,136 @@
+python3 partition_code/partition_info_gain_repeat.py --dataset reddit --num_parts 12 --balance_train --balance_edges --grp_parts 4 --output reddit_infogain_12to4
+load reddit takes 1.053 seconds
+|V|=232965, |E|=114615892
+train: 153431, valid: 23831, test: 55703
+...........................Metis start.............................
+Convert a graph into a bidirected graph: 2.627 seconds, peak memory: 8.920 GB
+Construct multi-constraint weights: 0.006 seconds, peak memory: 8.920 GB
+[22:38:11] /opt/dgl/src/graph/transform/metis_partition_hetero.cc:87: Partition a graph with 232965 nodes and 114615892 edges into 12 parts and get 18904166 edge cuts
+Metis partitioning: 30.444 seconds, peak memory: 11.533 GB
+Total Metis Time :  33.118011474609375
+............................Metis end..............................
+Run :  0
+Sequence : [0, 11, 5, 8, 9, 7, 6, 4, 2, 10, 1, 3]
+Final partition entropy:     {0: 2.7039448125135457, 3: 3.379201048763099, 2: 3.722903938835004, 1: 3.9856985924144177}
+Total Entropy: 3.4454043320020014
+Entropy Gap between max and min value :        1.281753779900872
+Total Time for this run :  0.1229867935180664
+...............................................................
+Run :  1
+Sequence : [4, 0, 3, 6, 7, 5, 9, 1, 2, 8, 11, 10]
+Final partition entropy:     {1: 2.648157979145507, 3: 3.5617442930649816, 0: 3.722903938835004, 2: 3.9856985924144177}
+Total Entropy: 3.4747749616724626
+Entropy Gap between max and min value :        1.3375406132689105
+Total Time for this run :  0.1237175464630127
+...............................................................
+Run :  2
+Sequence : [4, 5, 9, 2, 6, 3, 7, 1, 10, 0, 11, 8]
+Final partition entropy:     {3: 2.30857366009842, 2: 3.464367795389583, 1: 3.62754564286249, 0: 4.109549329779741}
+Total Entropy: 3.3886019976830775
+Entropy Gap between max and min value :        1.8009756696813208
+Total Time for this run :  0.12321639060974121
+...............................................................
+Run :  3
+Sequence : [7, 3, 8, 1, 5, 11, 0, 6, 4, 10, 9, 2]
+Final partition entropy:     {0: 2.754399838466902, 3: 3.4659422528978014, 2: 3.6471249473161933, 1: 4.263610248072845}
+Total Entropy: 3.5493949990446225
+Entropy Gap between max and min value :        1.5092104096059429
+Total Time for this run :  0.12316513061523438
+...............................................................
+Run :  4
+Sequence : [7, 1, 3, 2, 8, 9, 0, 5, 10, 11, 6, 4]
+Final partition entropy:     {3: 2.6648808656347085, 0: 3.3484515607123093, 1: 3.7970921945817357, 2: 4.109549329779741}
+Total Entropy: 3.4844587030235346
+Entropy Gap between max and min value :        1.4446684641450322
+Total Time for this run :  0.12305283546447754
+...............................................................
+Run :  5
+Sequence : [3, 10, 9, 0, 11, 2, 4, 5, 6, 1, 8, 7]
+Final partition entropy:     {1: 2.933560419705779, 3: 3.34906209947879, 2: 3.7970921945817357, 0: 4.109549329779741}
+Total Entropy: 3.5524558607390353
+Entropy Gap between max and min value :        1.1759889100739618
+Total Time for this run :  0.1296367645263672
+...............................................................
+Run :  6
+Sequence : [3, 2, 4, 11, 5, 6, 10, 9, 1, 7, 8, 0]
+Final partition entropy:     {1: 2.30857366009842, 3: 3.464367795389583, 2: 3.722903938835004, 0: 4.073265199973929}
+Total Entropy: 3.4007750010961773
+Entropy Gap between max and min value :        1.7646915398755092
+Total Time for this run :  0.1226041316986084
+...............................................................
+Run :  7
+Sequence : [3, 2, 5, 4, 0, 7, 11, 9, 6, 10, 8, 1]
+Final partition entropy:     {1: 2.30857366009842, 2: 3.480401018019327, 3: 3.957750369544141, 0: 4.263922131961245}
+Total Entropy: 3.5148064929703198
+Entropy Gap between max and min value :        1.9553484718628247
+Total Time for this run :  0.12340593338012695
+...............................................................
+Run :  8
+Sequence : [8, 7, 6, 3, 9, 0, 1, 4, 2, 10, 5, 11]
+Final partition entropy:     {1: 2.7803491419488306, 0: 3.4445333112208876, 2: 3.832625377155538, 3: 3.995931215657524}
+Total Entropy: 3.523716492940757
+Entropy Gap between max and min value :        1.2155820737086933
+Total Time for this run :  0.12284111976623535
+...............................................................
+Run :  9
+Sequence : [11, 3, 2, 0, 10, 5, 6, 4, 7, 9, 8, 1]
+Final partition entropy:     {2: 2.7803491419488306, 3: 3.2992085625481553, 0: 3.832625377155538, 1: 4.109549329779741}
+Total Entropy: 3.517400710679743
+Entropy Gap between max and min value :        1.32920018783091
+Total Time for this run :  0.12329554557800293
+...............................................................
+Run :  10
+Sequence : [2, 3, 10, 9, 0, 1, 8, 4, 5, 11, 7, 6]
+Final partition entropy:     {0: 2.6648808656347085, 2: 3.3484515607123093, 3: 3.7970921945817357, 1: 4.109549329779741}
+Total Entropy: 3.4844587030235346
+Entropy Gap between max and min value :        1.4446684641450322
+Total Time for this run :  0.12229371070861816
+...............................................................
+Run :  11
+Sequence : [7, 2, 5, 10, 9, 3, 4, 1, 0, 6, 8, 11]
+Final partition entropy:     {1: 2.971072280144248, 3: 3.464367795389583, 0: 3.504871472224518, 2: 3.893398761305228}
+Total Entropy: 3.461032410462653
+Entropy Gap between max and min value :        0.9223264811609799
+Total Time for this run :  0.12304902076721191
+...............................................................
+Run :  12
+Sequence : [10, 2, 8, 4, 1, 7, 6, 3, 11, 9, 5, 0]
+Final partition entropy:     {1: 2.7829169833049208, 0: 2.96969898486951, 2: 3.8254007980782814, 3: 4.089730405842427}
+Total Entropy: 3.4188869280757523
+Entropy Gap between max and min value :        1.3068134225375059
+Total Time for this run :  0.12272214889526367
+...............................................................
+Run :  13
+Sequence : [1, 2, 3, 0, 8, 11, 5, 6, 7, 9, 10, 4]
+Final partition entropy:     {1: 2.754399838466902, 3: 3.4783320795846033, 0: 3.7970921945817357, 2: 4.109549329779741}
+Total Entropy: 3.5488337573368938
+Entropy Gap between max and min value :        1.3551494913128388
+Total Time for this run :  0.12375402450561523
+...............................................................
+Run :  14
+Sequence : [4, 6, 3, 10, 5, 2, 1, 0, 7, 8, 9, 11]
+Final partition entropy:     {3: 2.90379883724453, 1: 3.5617442930649816, 0: 3.722903938835004, 2: 4.121391054885189}
+Total Entropy: 3.5758276822408646
+Entropy Gap between max and min value :        1.217592217640659
+Total Time for this run :  0.122894287109375
+...............................................................
+.......................................Final Selection...........................
+Selected Run :  2 With entropy value 3.3886019976830775
+All values [3.4454043320020014, 3.4747749616724626, 3.3886019976830775, 3.5493949990446225, 3.4844587030235346, 3.5524558607390353, 3.4007750010961773, 3.5148064929703198, 3.523716492940757, 3.517400710679743, 3.4844587030235346, 3.461032410462653, 3.4188869280757523, 3.5488337573368938, 3.5758276822408646]
+.........................new partition call to dump partitions.........................
+/home/ubuntu/workspace/partition_code/dump_part.py:155: UserWarning: To copy construct from a tensor, it is recommended to use sourceTensor.clone().detach() or sourceTensor.clone().detach().requires_grad_(True), rather than torch.tensor(sourceTensor).
+  node_parts = th.tensor(node_part_var, dtype=torch.int64)
+Reshuffle nodes and edges: 6.353 seconds
+Split the graph: 7.157 seconds
+Construct subgraphs: 11.130 seconds
+part 0 has 191553 nodes and 60115 are inside the partition
+part 0 has 29274281 edges and 29274281 are inside the partition
+part 1 has 185859 nodes and 55646 are inside the partition
+part 1 has 29552021 edges and 29552021 are inside the partition
+part 2 has 193875 nodes and 60139 are inside the partition
+part 2 has 29229285 edges and 29229285 are inside the partition
+part 3 has 184494 nodes and 57065 are inside the partition
+part 3 has 26560305 edges and 26560305 are inside the partition
+Save partitions: 5.270 seconds
+Total Time :  86.15314936637878
+......................................................................................

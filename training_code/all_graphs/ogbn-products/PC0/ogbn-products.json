@@ -1,0 +1,74 @@
+{
+    "edge_map": {
+        "_E": [
+            [
+                0,
+                31467095
+            ],
+            [
+                31467095,
+                63228238
+            ],
+            [
+                63228238,
+                93341459
+            ],
+            [
+                93341459,
+                123718280
+            ]
+        ]
+    },
+    "etypes": {
+        "_E": 0
+    },
+    "graph_name": "ogbn-products",
+    "halo_hops": 1,
+    "node_map": {
+        "_N": [
+            [
+                0,
+                582891
+            ],
+            [
+                582891,
+                1199182
+            ],
+            [
+                1199182,
+                1829748
+            ],
+            [
+                1829748,
+                2449029
+            ]
+        ]
+    },
+    "ntypes": {
+        "_N": 0
+    },
+    "num_edges": 123718280,
+    "num_nodes": 2449029,
+    "num_parts": 4,
+    "part-0": {
+        "edge_feats": "part0/edge_feat.dgl",
+        "node_feats": "part0/node_feat.dgl",
+        "part_graph": "part0/graph.dgl"
+    },
+    "part-1": {
+        "edge_feats": "part1/edge_feat.dgl",
+        "node_feats": "part1/node_feat.dgl",
+        "part_graph": "part1/graph.dgl"
+    },
+    "part-2": {
+        "edge_feats": "part2/edge_feat.dgl",
+        "node_feats": "part2/node_feat.dgl",
+        "part_graph": "part2/graph.dgl"
+    },
+    "part-3": {
+        "edge_feats": "part3/edge_feat.dgl",
+        "node_feats": "part3/node_feat.dgl",
+        "part_graph": "part3/graph.dgl"
+    },
+    "part_method": "metis"
+}

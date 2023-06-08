@@ -1,0 +1,35 @@
+python3 partition_code/partition_graph_default.py --dataset reddit --num_parts 4 --balance_train --balance_edges --output reddit_partition_default
+DGL backend not selected or invalid.  Assuming PyTorch for now.
+Setting the default backend to "pytorch". You can change it in the ~/.dgl/config.json file or export the DGLBACKEND environment variable.  Valid options are: pytorch, mxnet, tensorflow (all lowercase)
+Downloading /home/ubuntu/.dgl/reddit.zip from https://data.dgl.ai/dataset/reddit.zip...
+Extracting file to /home/ubuntu/.dgl/reddit
+load reddit takes 52.473 seconds
+|V|=232965, |E|=114615892
+train: 153431, valid: 23831, test: 55703
+[22 22 22 ... 30 30 22]
+CLASSES:       [ 0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23
+ 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40]
+NUMBER:       41
+...........................start...................................
+Converting to homogeneous graph takes 0.879s, peak mem: 16.272 GB
+Convert a graph into a bidirected graph: 2.591 seconds, peak memory: 16.272 GB
+Construct multi-constraint weights: 0.006 seconds, peak memory: 16.272 GB
+[22:19:40] /opt/dgl/src/graph/transform/metis_partition_hetero.cc:87: Partition a graph with 232965 nodes and 114615892 edges into 4 parts and get 9443919 edge cuts
+Metis partitioning: 28.580 seconds, peak memory: 16.272 GB
+Assigning nodes to METIS partitions takes 31.218s, peak mem: 16.272 GB
+Reshuffle nodes and edges: 6.104 seconds
+Split the graph: 6.802 seconds
+Construct subgraphs: 10.074 seconds
+Splitting the graph into partitions takes 23.170s, peak mem: 22.439 GB
+part 0 has 184598 nodes and 55554 are inside the partition
+part 0 has 35357834 edges and 29518232 are inside the partition
+part 1 has 162118 nodes and 58966 are inside the partition
+part 1 has 33239862 edges and 28140524 are inside the partition
+part 2 has 167837 nodes and 59792 are inside the partition
+part 2 has 32088396 edges and 28110349 are inside the partition
+part 3 has 169072 nodes and 58653 are inside the partition
+part 3 has 32817638 edges and 28846787 are inside the partition
+Save partitions: 22.070 seconds, peak memory: 22.439 GB
+There are 114615892 edges in the graph and 0 edge cuts for 4 partitions.
+........................................................
+Total Time :  79.49864411354065

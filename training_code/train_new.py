@@ -24,6 +24,7 @@ from models.correct_and_smooth import CorrectAndSmooth
 from models.distsage import DistSAGE
 from models.focal_loss import FocalLoss
 from models.pick_sampler import LabelBalancedSampler
+from models.BiasedNeighbourSampler import BiasedNeighbourSampler
 from utils import save_metrics, plot_graphs, save_tuning_summary
 from best_hparams import BEST_HPARAMS
 # import torch.profiler
@@ -113,6 +114,7 @@ def evaluate(ensemble, g, inputs, labels, nid, batch_size, device, agg, n_classe
     return compute_acc(pred[nid], labels[nid], agg=agg, multilabel=multilabel)
 
 def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, agg, stopper=None, reg_model=None):
+    
     process = psutil.Process()
     A = g.local_partition.adj(scipy_fmt='coo')
     pb = g.get_partition_book()
@@ -145,16 +147,20 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
     print("SAMPLER PART ASSIGNED")
     print("PART",pb.partid,g.edata)
     
+    
     def give_train_data(method):
         # print(local_train_nid.size, probs.size)
         if method == 0:
+            print("***********************************")
+            print(" Entered the Training Data")
             sample_idx = train_nid
             args["log_every"] = len(train_nid) // args["batch_size"] - 1
         else:
+            print("**********LabelBalanced Sampler*******************")
             lbs = LabelBalancedSampler(A, g.ndata["label"][local_train_nid].numpy(), pb.nid2localnid(local_train_nid, pb.partid).numpy(), multilabel=multilabel[args['graph_name']])
             probs = lbs.all_probabilities()
             sample_idx = np.random.choice(local_train_nid, size=int(int(len(train_nid)/4)-len(halo_train_nid)), replace=False, p=probs)
-            sample_idx =th.cat((th.tensor(halo_train_nid, device=device),th.tensor(sample_idx, device=device)))
+            sample_idx = th.cat((th.tensor(halo_train_nid, device=device),th.tensor(sample_idx, device=device)))
             # print(len(sample_idx))
             args["log_every"] = len(sample_idx) // args["batch_size"]
         
@@ -178,7 +184,6 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
     prob_halo = []
     for epoch in range(num_epochs):
         tic = time.time()
-
         sample_time = 0
         forward_time = 0
         backward_time = 0
@@ -188,10 +193,12 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
         start = time.time()
         # Loop over the dataloader to sample the computation dependency graph
         # as a list of blocks.
-        probab_step = []
         step_time = []
         dataloader = give_train_data(args["sampler"])
+        probab_step = []
+
         for step, (input_nodes, seeds, blocks) in enumerate(dataloader):
+            
             block_p = 0
             for b,block in enumerate(blocks):
                 edge_ids = np.array(block.edata[dgl.EID])
@@ -215,6 +222,8 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
             # prob_arr[tmp_halo_eid] = 100
             # probab = th.tensor(prob_arr).long()
             # g.edata[weight] = probab
+
+            
             tic_step = time.time()
             sample_time += tic_step - start
             # fetch features/labels
@@ -279,9 +288,12 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
                 metrics['train_micf1'].append(micro_f1)
                 metrics['train_speed'].append(np.mean(iter_tput[3:]))
                 metrics['mem_usage'].append(mem_usage)
+
             start = time.time()
+
         # print(f"Probability of halo nodes in epoch {epoch} is ",global_halo/global_all)
         prob_halo.append(sum(probab_step)/len(probab_step))
+        print("----------------")
         toc = time.time()
         scheduler.step()
         metrics['train_time'].append(toc-tic)
@@ -395,6 +407,7 @@ def run(args, device, data):
         general_model = th.nn.parallel.DistributedDataParallel(general_model)
 
         with general_model.join():
+
             train_model(general_model, loss_fcn, g, train_nid, device, metrics,
                         args, val_nid, True, stopper if args["early_stop"] else None)
         
@@ -572,7 +585,7 @@ def main(args):
         part_config=args["part_config"]
     )
     print(socket.gethostname(), "rank:", g.rank())
-
+    
     pb = g.get_partition_book()
     if "trainer_id" in g.ndata:
         train_nid = dgl.distributed.node_split(

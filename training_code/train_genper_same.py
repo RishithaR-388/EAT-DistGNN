@@ -5,7 +5,6 @@ import psutil
 import os
 from contextlib import contextmanager
 import json
-
 import pandas as pd
 import numpy as np
 # import matplotlib.pyplot as plt
@@ -153,11 +152,17 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
     if args['graph_name'] == 'yelp':
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=40, gamma=0.3)
+    # if agg:
+    #     num_epochs = int(args['num_epochs']*args['genper_ratio'])
+    # else:
+    #     if args['genper_ratio'] == -1:
+    #         num_epochs = args['num_epochs']
+    #     else:
+    #         args['num_epochs']-int(args['num_epochs']*args['genper_ratio'])
     num_epochs = int(args['num_epochs']*args['genper_ratio']) if agg else (
-        args['num_epochs']-int(args['num_epochs']*args['genper_ratio']))
+    args['num_epochs']-int(args['num_epochs']*args['genper_ratio']))
     for epoch in range(num_epochs):
         tic = time.time()
-
         sample_time = 0
         forward_time = 0
         backward_time = 0
@@ -189,6 +194,8 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
             loss = loss_fcn(batch_pred, batch_labels)
             forward_end = time.time()
             optimizer.zero_grad()
+            loss_reg_ratio = 1
+            regularization = 1
             if reg_model != None:
                 #personal weight regularization
                 p_vec, g_vec = [], []
@@ -199,16 +206,18 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
                 p_ten, g_ten = th.cat(p_vec), th.cat(g_vec)
                 regularization = th.linalg.vector_norm(p_ten - g_ten)
                 # if g.rank() == 2:
-                #     print(loss, regularization)
+                #print(loss, regularization)
+                lo  = loss
+                print(args['llambda']*regularization)
+                water = args['llambda']*regularization
+                loss_reg_ratio = water/lo
                 loss = loss + args['llambda']*regularization
             loss.backward()
             compute_end = time.time()
             forward_time += forward_end - start
             backward_time += compute_end - forward_end
-
             optimizer.step()
             update_time += time.time() - compute_end
-
             step_t = time.time() - tic_step
             step_time.append(step_t)
             iter_tput.append(
@@ -229,6 +238,8 @@ def train_model(model, loss_fcn, g, train_nid, device, metrics, args, val_nid, a
                         np.sum(step_time[-args['log_every']:])
                     )
                 )
+                metrics['regularization'].append(regularization)
+                metrics['loss_reg_ratio'].append(loss_reg_ratio)
                 metrics['train_loss'].append(loss.item())
                 metrics['train_macf1'].append(macro_f1)
                 metrics['train_micf1'].append(micro_f1)
@@ -299,6 +310,8 @@ def run(args, device, data):
             model_save_path=f'{args["metrics_path"]}/es_checkpoint_{g.rank()}.pt', num_machines=dgl.distributed.get_num_client(), patience = args["early_stop"]) 
 
     metrics = {
+        'regularization':[],
+        'loss_reg_ratio':[],
         'train_loss': [],
         'train_macf1': [],
         'train_micf1': [],
@@ -309,7 +322,6 @@ def run(args, device, data):
         'val_micf1': []
     }
     final_report = {}
-
     # sampler = dgl.dataloading.NeighborSampler(
     #     [int(fanout) for fanout in args["fan_out"].split(",")]
     # )
@@ -346,7 +358,8 @@ def run(args, device, data):
         )
         general_model = general_model.to(device)
         general_model = th.nn.parallel.DistributedDataParallel(general_model)
-
+        """ The with general_model.join(): statement is used to ensure that all processes running the distributed training finish before the program exits. 
+        It's necessary to include this statement when using distributed training, as it ensures that all processes communicate with each other and synchronize their operations before terminating."""
         with general_model.join():
             train_model(general_model, loss_fcn, g, train_nid, device, metrics,
                         args, val_nid, True, stopper if args["early_stop"] else None)
@@ -379,7 +392,6 @@ def run(args, device, data):
         # loss_fcn = th.nn.CrossEntropyLoss()
         loss_fcn = loss_fcn.to(device)
         # args["log_every"] = len(train_nid) // args["batch_size"] - 1
-
         personal_model = DistSAGE(
             in_feats,
             args["num_hidden"],
@@ -391,9 +403,26 @@ def run(args, device, data):
         personal_model = personal_model.to(device)
 
         if args["genper_ratio"] != 0:
+            # if args["genper_ratio"] == -1:
+            #         general_model = DistSAGE(
+            #                     in_feats,
+            #                     args["num_hidden"],
+            #                     n_classes,
+            #                     args["num_layers"],
+            #                     F.relu,
+            #                     args["dropout"]
+            #                 )
+            #         general_model = general_model.to(device)
+            #         general_model = th.nn.parallel.DistributedDataParallel(general_model)
+            #         general_model.module.load_state_dict(
+            #             th.load(f'/home/vishwesh/Final_Code/dhruv/reddit-0-001500-Gen/results/es_checkpoint_{g.rank()}.pt'))
+            #         print("Initializing personal model with general model")
+            #         personal_model.load_state_dict(
+            #             th.load(f'/home/vishwesh/Final_Code/dhruv/reddit-0-001500-Gen/results/es_checkpoint_{g.rank()}.pt'))
+            #
             print("Initializing personal model with general model")
             personal_model.load_state_dict(
-                    th.load(f'{args["metrics_path"]}/es_checkpoint_{g.rank()}.pt'))
+                th.load(f'{args["metrics_path"]}/es_checkpoint_{g.rank()}.pt'))
             
         train_model(personal_model, loss_fcn, g, train_nid, device, metrics,
                     args, val_nid, False, stopper if args["early_stop"] else None, general_model.module if args["genper_ratio"] != 0 else None)
@@ -411,9 +440,9 @@ def run(args, device, data):
     per_end = time.time()
     g.barrier()
     acc_metric = 'micro avg' if multilabel[args['graph_name']] else 'accuracy'
-    gen_train_time = 0 if args['genper_ratio']==0 else gen_end-gen_start - (gen_eval_end-gen_eval_start)
-    per_train_time = 0 if args['genper_ratio']==1 else per_end-per_start - (per_eval_end-per_eval_start)
-    gen_eval_time = 0 if args['genper_ratio']==0 else gen_eval_end-gen_eval_start
+    gen_train_time = 0 if (args['genper_ratio']==0 or args['genper_ratio']== -1) else gen_end-gen_start - (gen_eval_end-gen_eval_start)
+    per_train_time = 0 if args['genper_ratio']== 1 else per_end-per_start - (per_eval_end-per_eval_start)
+    gen_eval_time = 0 if (args['genper_ratio']==0 or args['genper_ratio']== -1) else gen_eval_end-gen_eval_start
     per_eval_time = 0 if args['genper_ratio']==1 else per_eval_end-per_eval_start
     summmary_metrics = {
         'best_acc': 0,
